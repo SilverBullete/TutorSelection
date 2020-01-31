@@ -11,6 +11,23 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+try:
+    from local_settings import LOCAL_APP_CODE, LOCAL_SECRET_KEY, LOCAL_DATABASE
+except ImportError:
+    LOCAL_SECRET_KEY = ''
+    LOCAL_DATABASE = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': LOCAL_APP_CODE,
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': 'localhost',
+            'post': 3306,
+        },
+    }
+
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +37,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')cy@&0jtf=tp))g56&t6^!vori*9&z!f-7^e5w^fsvxlokdt-0'
+SECRET_KEY = LOCAL_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -73,12 +90,7 @@ WSGI_APPLICATION = 'TutorSelection.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+
 
 
 # Password validation
