@@ -15,6 +15,7 @@ try:
     from local_settings import LOCAL_APP_CODE, LOCAL_SECRET_KEY, LOCAL_DATABASE
 except ImportError:
     LOCAL_SECRET_KEY = ''
+    LOCAL_APP_CODE = ''
     LOCAL_DATABASE = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -25,9 +26,6 @@ except ImportError:
             'post': 3306,
         },
     }
-
-import pymysql
-pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -90,7 +88,7 @@ WSGI_APPLICATION = 'TutorSelection.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-
+DATABASE = LOCAL_DATABASE
 
 
 # Password validation
