@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+
 try:
-    from local_settings import LOCAL_APP_CODE, LOCAL_SECRET_KEY, LOCAL_DATABASE
+    from .local_settings import LOCAL_APP_CODE, LOCAL_SECRET_KEY, LOCAL_DATABASE
 except ImportError:
     LOCAL_SECRET_KEY = ''
     LOCAL_APP_CODE = ''
@@ -52,8 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Main',
-    'account',
 ]
 
 MIDDLEWARE = [
@@ -90,7 +89,7 @@ WSGI_APPLICATION = 'TutorSelection.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASE = LOCAL_DATABASE
+DATABASES = LOCAL_DATABASE
 
 
 # Password validation
