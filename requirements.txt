@@ -1,5 +1,8 @@
 Django==2.2.10
+django-cors-headers==3.2.1
 mysqlclient==1.4.6
 Pillow==7.0.0
+pycryptodomex==3.9.7
 pytz==2019.3
+requests==2.23.0
 sqlparse==0.3.0

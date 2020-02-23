@@ -10,7 +10,7 @@ import axios from 'axios'
 // 配置请求根路径
 axios.defaults.baseURL = 'http://127.0.0.1:8001/api/'
 Vue.prototype.$http = axios
-
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-fromurlencodeed'
 Vue.config.productionTip = false
 
 new Vue({
