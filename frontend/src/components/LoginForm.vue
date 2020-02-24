@@ -97,7 +97,7 @@ export default {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -210px);
-
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
   }
   .login_header {
     margin-top: 20px;
