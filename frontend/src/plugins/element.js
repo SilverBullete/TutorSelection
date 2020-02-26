@@ -4,7 +4,7 @@ import {
     Message, Container, Header, Aside, Main, Carousel, CarouselItem,
     Menu, Submenu, MenuItemGroup, MenuItem, Row, Col, Cascader, Table,
     TableColumn, Tag, MessageBox, Scrollbar, Divider, Link, Breadcrumb,
-    BreadcrumbItem
+    BreadcrumbItem, Tabs, TabPane, Image
 } from 'element-ui'
 
 Vue.use(Button)
@@ -31,10 +31,12 @@ Vue.use(Cascader)
 Vue.use(Table)
 Vue.use(TableColumn)
 Vue.use(Tag)
-// Vue.use(MessageBox)
 Vue.prototype.$alert = MessageBox.alert
 Vue.use(Scrollbar)
 Vue.use(Divider)
 Vue.use(Link)
 Vue.use(Breadcrumb)
 Vue.use(BreadcrumbItem)
+Vue.use(Tabs)
+Vue.use(TabPane)
+Vue.use(Image)

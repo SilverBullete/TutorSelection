@@ -25,11 +25,13 @@
     import studentInfo from '../components/StudentInfo'
     import studentResume from '../components/StudentResume'
     import studentUTS from '../components/StudentUTS'
+    import studentUTSRes from '../components/StudentUTSRes'
+    import announcement from '../components/Announcement'
     export default {
-        components: { studentAside, studentInfo, studentResume, studentUTS },
+        components: { studentAside, studentInfo, studentResume, studentUTS, announcement, studentUTSRes },
         data: function () {
             return {
-                currentMenuComponent: studentUTS
+                currentMenuComponent: studentUTSRes
             }
         }
     }
@@ -64,8 +66,14 @@
     height: 100%;
 }
 .el-main{
-    // width: 100%;
+    width: 100%;
+    height: 100%;
     padding: 0 24px 24px 24px;
+    background-color: #F0F2F5;
+}
+.el-scrollbar{
+    height: 100%;
+    width: 100%;
     background-color: #F0F2F5;
 }
 </style>
