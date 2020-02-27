@@ -1,8 +1,13 @@
+cffi==1.14.0
+cryptography==2.8
 Django==2.2.10
 django-cors-headers==3.2.1
 mysqlclient==1.4.6
 Pillow==7.0.0
+pycparser==2.19
 pycryptodomex==3.9.7
+PyJWT==1.7.1
 pytz==2019.3
 requests==2.23.0
+six==1.14.0
 sqlparse==0.3.0

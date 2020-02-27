@@ -8,8 +8,12 @@
       background-color="#001529"
       text-color="#ffffff"
       active-text-color="#ffffff"
+      :router="true"
     >
-      <el-menu-item index="1">
+      <el-menu-item
+        index="1"
+        :route="{name:'announcement'}"
+      >
         <template slot="title">
           <i class="el-icon-message" />公告
         </template>
@@ -19,10 +23,16 @@
           <i class="el-icon-user" />个人信息
         </template>
         <el-menu-item-group>
-          <el-menu-item index="2-1">
+          <el-menu-item
+            index="2-1"
+            :route="{name:'info'}"
+          >
             个人基本信息
           </el-menu-item>
-          <el-menu-item index="2-2">
+          <el-menu-item
+            index="2-2"
+            :route="{name:'resume'}"
+          >
             个人简历
           </el-menu-item>
         </el-menu-item-group>
@@ -32,10 +42,16 @@
           <i class="el-icon-menu" />本科导师选择
         </template>
         <el-menu-item-group>
-          <el-menu-item index="3-1">
+          <el-menu-item
+            index="3-1"
+            :route="{name:'select'}"
+          >
             导师选择
           </el-menu-item>
-          <el-menu-item index="3-2">
+          <el-menu-item
+            index="3-2"
+            :route="{name:'result'}"
+          >
             选择情况
           </el-menu-item>
         </el-menu-item-group>

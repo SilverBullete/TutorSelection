@@ -50,7 +50,7 @@
         >
           <template slot-scope="scope">
             <el-link
-              href="https://element.eleme.io"
+              :href="scope.row.profile"
               target="_blank"
               type="primary"
             >
@@ -64,10 +64,25 @@
         >
           <template slot-scope="scope">
             <el-tag
-              :type="success"
+              v-if="scope.row.pass_status==0"
+              type="info"
               effect="dark"
             >
-              通过
+              待通过
+            </el-tag>
+            <el-tag
+              v-if="scope.row.pass_status==1"
+              type="success"
+              effect="dark"
+            >
+              已通过 
+            </el-tag>
+            <el-tag
+              v-if="scope.row.pass_status==2"
+              type="danger"
+              effect="dark"
+            >
+              未通过
             </el-tag>
           </template>
         </el-table-column>
@@ -80,26 +95,23 @@
 export default {
     data () {
       return {
-        resultData: [{
-          type: '第一志愿',
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          type: '第二志愿',
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }]
+        resultData: []
       }
     },
+  created () {
+        this.loading = true
+        const _this = this
+        const token = window.sessionStorage.getItem('token')
+        this.$http.post('student/get_selection_res', { token: token }).then(function (res) {
+          _this.resultData = res.data.data
+        })
+        this.loading = false
+      },
  methods: {
       tableRowClassName ({ row, rowIndex }) {
-        if (rowIndex === 0) {
+        if (row.pass_status === 2) {
           return 'warning-row'
-        } else if (rowIndex === 1) {
+        } else if (row.pass_status === 1) {
           return 'success-row'
         }
         return ''

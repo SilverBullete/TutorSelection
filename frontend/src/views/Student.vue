@@ -13,7 +13,9 @@
       <studentAside />
       <el-scrollbar>
         <el-main>
-          <component :is="currentMenuComponent" />
+          <transition name="student">
+            <router-view />
+          </transition>
         </el-main>
       </el-scrollbar>
     </el-container>
@@ -28,10 +30,10 @@
     import studentUTSRes from '../components/StudentUTSRes'
     import announcement from '../components/Announcement'
     export default {
-        components: { studentAside, studentInfo, studentResume, studentUTS, announcement, studentUTSRes },
+        components: { studentAside },
         data: function () {
             return {
-                currentMenuComponent: studentUTSRes
+                
             }
         }
     }

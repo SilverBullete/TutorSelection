@@ -32,6 +32,7 @@ Vue.use(Table)
 Vue.use(TableColumn)
 Vue.use(Tag)
 Vue.prototype.$alert = MessageBox.alert
+Vue.prototype.$confirm = MessageBox.confirm
 Vue.use(Scrollbar)
 Vue.use(Divider)
 Vue.use(Link)

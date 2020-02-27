@@ -27,7 +27,7 @@ class Student(models.Model):
     password = models.CharField(max_length=50, default="", verbose_name="密码")
     name = models.CharField(max_length=50, default="", verbose_name="学生姓名")
     gender = models.IntegerField(choices=GENDER_CHOICE, default=0, verbose_name="性别")
-    Avatar = models.ImageField(upload_to=get_path, verbose_name="学生头像")
+    avatar = models.ImageField(upload_to=get_path, verbose_name="学生头像")
     grade = models.CharField(max_length=4, default="", verbose_name="年级")
     college = models.CharField(max_length=50, default="", verbose_name="学院名称")
     subject = models.CharField(max_length=50, default="", verbose_name="专业名称")
@@ -35,6 +35,7 @@ class Student(models.Model):
     profile = models.TextField(default="", verbose_name="个人简介")
     award = models.TextField(default="", verbose_name="获奖情况")
     agree_distribution = models.BooleanField(default=False, verbose_name="接受分配")
+    objects = models.Manager()
 
 
 class Teacher(models.Model):
@@ -42,11 +43,41 @@ class Teacher(models.Model):
     password = models.CharField(max_length=50, default="", verbose_name="密码")
     name = models.CharField(max_length=50, default="", verbose_name="教师姓名")
     gender = models.IntegerField(choices=GENDER_CHOICE, default=0, verbose_name="性别")
-    Avatar = models.ImageField(upload_to=get_path, verbose_name="教师头像")
+    avatar = models.ImageField(upload_to=get_path, verbose_name="教师头像")
     college = models.CharField(max_length=50, default="", verbose_name="学院名称")
+    institute = models.CharField(max_length=50, default="", verbose_name="导师研究机构")
     subject = models.CharField(max_length=50, default="", verbose_name="导师方向")
     profile = models.TextField(default="", verbose_name="个人简介")
     award = models.TextField(default="", verbose_name="获奖情况")
+    objects = models.Manager()
+
+    @staticmethod
+    def get_institute_list():
+        institutes = Teacher.objects.values("college", "institute")
+        data = []
+        for institute in institutes:
+            if institute not in data:
+                data.append(institute)
+        institutes = sorted(data, key=lambda k: k['college'])
+        res = []
+        college = ""
+        for institute in institutes:
+            if institute['college'] != college:
+                college = institute['college']
+                res.append({
+                    'value': college,
+                    'label': college,
+                    'children': [{
+                        'value': institute['institute'],
+                        'label': institute['institute']
+                    }]
+                })
+            else:
+                res[-1]['children'].append({
+                    'value': institute['institute'],
+                    'label': institute['institute']
+                })
+        return res
 
 
 class Administrator(models.Model):
@@ -54,6 +85,7 @@ class Administrator(models.Model):
     username = models.CharField(max_length=12, default="", verbose_name="登录账号")
     password = models.CharField(max_length=50, default="", verbose_name="密码")
     grade = models.CharField(max_length=50, default="", verbose_name="管理年级")
+    objects = models.Manager()
 
 
 class Selection(models.Model):
@@ -61,7 +93,8 @@ class Selection(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="学生")
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name="导师")
     is_first = models.BooleanField(default=True, verbose_name="是否为第一志愿导师")
-    pass_status = models.IntegerField(choices=PASS_CHOICE, verbose_name="通过情况")
+    pass_status = models.IntegerField(choices=PASS_CHOICE, default=0, verbose_name="通过情况")
+    objects = models.Manager()
 
 
 class Publicity(models.Model):
@@ -71,6 +104,7 @@ class Publicity(models.Model):
     admin = models.ForeignKey(Administrator, on_delete=models.CASCADE, verbose_name="发布者")
     start_time = models.DateTimeField(default=datetime.now, verbose_name="开始公示时间")
     end_time = models.DateTimeField(default=datetime.now, verbose_name="公示结束时间")
+    objects = models.Manager()
 
 
 class OpeningTime(models.Model):
@@ -79,9 +113,11 @@ class OpeningTime(models.Model):
     admin = models.ForeignKey(Administrator, on_delete=models.CASCADE, verbose_name="开放者")
     start_time = models.DateTimeField(default=datetime.now, verbose_name="开始开放时间")
     end_time = models.DateTimeField(default=datetime.now, verbose_name="公示开放时间")
+    objects = models.Manager()
 
 
 class File(models.Model):
     id = models.AutoField
     file = models.FileField(upload_to="file")
     publicity = models.ForeignKey(Publicity, on_delete=models.CASCADE, verbose_name="公示")
+    objects = models.Manager()

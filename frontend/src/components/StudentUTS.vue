@@ -16,18 +16,20 @@
       <div class="select">
         <span class="demonstration">信息筛选</span>
         <el-cascader
+          ref="myCascader"
+          placeholder="搜索研究机构"
           :options="options"
-          :props="{ multiple: true, checkStrictly: true, expandTrigger: 'hover' }"
-          collapse-tags
+          :props="{ multiple: true, expandTrigger: 'hover' }"
           clearable
+          filterable
+          @change="change"
         />
       </div>
       <div class="institute">
         <el-tag
           v-for="tag in tags"
           :key="tag.name"
-          closable
-          :type="tag.type"
+          type="info"
           @click="open"
         >
           {{ tag.name }}
@@ -67,7 +69,7 @@
           >
             <template slot-scope="scope">
               <el-link
-                href="https://element.eleme.io"
+                :href="scope.row.profile"
                 target="_blank"
                 type="primary"
               >
@@ -90,16 +92,34 @@
             </template>
             <template slot-scope="scope">
               <el-button
+                v-if="select[0] === scope.row.id"
                 size="mini"
                 type="primary"
-                @click="handleEdit(scope.$index, scope.row)"
               >
                 第一导师
               </el-button>
               <el-button
+                v-else=""
                 size="mini"
-                type=""
-                @click="handleDelete(scope.$index, scope.row)"
+                type="primary"
+                plain
+                @click="first(scope.$index, scope.row)"
+              >
+                第一导师
+              </el-button>
+              <el-button
+                v-if="select[1] === scope.row.id"
+                size="mini"
+                type="info"
+              >
+                第二导师
+              </el-button>
+              <el-button
+                v-else=""
+                size="mini"
+                type="info"
+                plain
+                @click="second(scope.$index, scope.row)"
               >
                 第二导师
               </el-button>
@@ -110,6 +130,7 @@
           <div class="btn">
             <el-button
               type="primary"
+              @click="submit"
             >
               提交
             </el-button>
@@ -124,85 +145,124 @@
 export default {
   data () {
     return {
-      options: [
-        {
-          value: 'zhinan',
-          label: '计算机科学与技术学院、软件学院',
-          children: [{
-            value: 'shejiyuanze',
-            label: '计算机智能系统研究所'
-          }]
-        }, {
-          value: 'zhinan',
-          label: '计算机科学与技术学院、软件学院',
-          children: [{
-            value: 'shejiyuanze',
-            label: '计算机智能系统研究所2'
-          }]
-        }
-      ],
-      tags: [
-        { name: '计算机智能系统研究所', type: 'info' }
-      ],
-      tableData: [{
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }, {
-          name: '沈国江',
-          college: '计算机科学与技术学院、软件学院',
-          institute: '计算机智能系统研究所',
-          subject: '智慧城市、智能交通系统、大数据技术'
-        }],
-        search: ''
+      select: [],
+      options: [],
+      tags: [],
+      tableData: [],
+      search: ''
     }
   },
+  created () {
+    this.loading = true
+    const _this = this
+    const token = window.sessionStorage.getItem('token')
+    this.$http.post('student/get_teachers', { token: token }).then(function (res) {
+      _this.select = [res.data.data.select[0].id, res.data.data.select[1].id]
+      _this.tableData = res.data.data.select.concat(res.data.data.teachers)
+      _this.options = res.data.data.options
+    })
+    this.loading = false
+  },
   methods: {
-      open () {
-        this.$alert('这是一段内容', '标题名称', {
+    open () {
+      this.$alert('这是一段内容', '标题名称', {
+        confirmButtonText: '确定',
+        callback: action => {
+        }
+      })
+    },
+    first (index, row) {
+      this.$confirm('你确定选择' + row.name + '老师替代' + this.tableData[0].name + '老师作为你的第一志愿导师吗？', '提示', {
           confirmButtonText: '确定',
-          callback: action => {
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '选择成功！注意提交保存修改！'
+          })
+          this.select[0] = row.id
+          const nodes = this.$refs.myCascader.getCheckedNodes(true)
+          const institutes = []
+          nodes.forEach(node => {
+            institutes.push(node.value)
+          })
+          const _this = this
+          const token = window.sessionStorage.getItem('token')
+          if (institutes.length) {
+            this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
+            _this.tableData = res.data.data.teachers
+          }) 
+          } else {
+            this.$http.post('student/get_teachers', { token: token, select: this.select }).then(function (res) {
+              _this.tableData = res.data.data.select.concat(res.data.data.teachers)
+            })
           }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已撤销选择'
+          })          
         })
-      },
-      handleEdit (index, row) {
-        console.log(index, row)
-      },
-      handleDelete (index, row) {
-        console.log(index, row)
+    },
+    second (index, row) {
+      this.$confirm('你确定选择' + row.name + '老师替代' + this.tableData[1].name + '老师作为你的第二志愿导师吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '选择成功！注意提交保存修改！'
+          })
+          this.select[1] = row.id
+          const nodes = this.$refs.myCascader.getCheckedNodes(true)
+          const institutes = []
+          nodes.forEach(node => {
+            institutes.push(node.value)
+          })
+          const _this = this
+          const token = window.sessionStorage.getItem('token')
+          if (institutes.length) {
+            this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
+            _this.tableData = res.data.data.teachers
+          }) 
+          } else {
+            this.$http.post('student/get_teachers', { token: token, select: this.select }).then(function (res) {
+              _this.tableData = res.data.data.select.concat(res.data.data.teachers)
+            })
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已撤销选择'
+          })          
+        })
+    },
+    submit () {
+
+    },
+    change (items) {
+      const tags = []
+      const institutes = []
+      items.forEach(node => {
+          tags.push({ name: node[1] })
+          institutes.push(node[1])
+      })
+      this.tags = tags
+      const _this = this
+      const token = window.sessionStorage.getItem('token')
+      if (institutes.length) {
+      this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
+        _this.tableData = res.data.data.teachers
+      }) 
+      } else {
+        this.$http.post('student/get_teachers', { token: token, select: this.select }).then(function (res) {
+          _this.tableData = res.data.data.select.concat(res.data.data.teachers)
+        })
       }
     }
+  }
 }
 </script>
 
@@ -249,7 +309,8 @@ export default {
     margin: 0 24px;
   }
   .submit{
-    padding-bottom: 20px;
+    padding-bottom: 24px;
+    padding-top: 24px;
     > .btn{
       display: flex;
       justify-content: flex-end;
