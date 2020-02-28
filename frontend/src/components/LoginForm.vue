@@ -56,7 +56,7 @@ export default {
       loginForm: {
         type: '学生',
         id: '201700000000',
-        password: '123456'
+        password: '123456qaz'
       },
       loginFormRules: {
         id: [
@@ -77,7 +77,8 @@ export default {
         const { data: res } = await this.$http.post('login', this.loginForm)
         if (res.code !== 200) return this.$message.error(res.message)
         window.sessionStorage.setItem('token', res.data.token)
-        // this.$router.push('/home')
+        if (this.loginForm.password.length < 8) return this.$router.push('/password')
+        if (res.data.type === 'student') return this.$router.push('/student')
       })
     }
   }
@@ -97,7 +98,7 @@ export default {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -210px);
-
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
   }
   .login_header {
     margin-top: 20px;
