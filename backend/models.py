@@ -32,6 +32,8 @@ class Student(models.Model):
     college = models.CharField(max_length=50, default="", verbose_name="学院名称")
     subject = models.CharField(max_length=50, default="", verbose_name="专业名称")
     class_name = models.CharField(max_length=50, default="", verbose_name="班级名称")
+    gpa = models.FloatField(default=0, verbose_name="绩点")
+    rank = models.CharField(max_length=50, default="", verbose_name="绩点排名")
     profile = models.TextField(default="", verbose_name="个人简介")
     award = models.TextField(default="", verbose_name="获奖情况")
     agree_distribution = models.BooleanField(default=False, verbose_name="接受分配")

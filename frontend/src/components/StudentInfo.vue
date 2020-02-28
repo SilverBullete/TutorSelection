@@ -74,7 +74,7 @@
               </el-col>
               <el-col :span="8">
                 <el-image :src="src">
-                  <!-- <div
+                  <div
                     slot="placeholder"
                     class="image-slot"
                   >
@@ -85,7 +85,7 @@
                     class="image-slot"
                   >
                     <i class="el-icon-picture-outline" />
-                  </div> -->
+                  </div>
                 </el-image>
                 <el-button
                   type="primary"
@@ -101,7 +101,7 @@
           <el-row :gutter="20">
             <el-col :span="16">
               <el-form
-                ref="passForm"
+                ref="passFormRef"
                 :model="passForm"
                 status-icon
                 :rules="rules"
@@ -140,11 +140,11 @@
                 <el-form-item>
                   <el-button
                     type="primary"
-                    @click="submitForm('ruleForm')"
+                    @click="submitForm"
                   >
                     提交
                   </el-button>
-                  <el-button @click="resetForm('ruleForm')">
+                  <el-button @click="resetForm">
                     重置
                   </el-button>
                 </el-form-item>
@@ -177,7 +177,7 @@ export default {
         } else if (!reg.test(value)) {
           callback(new Error('密码必须包含数字和字母，且只能包含以下特殊字符：!@*$-_()+=&'))
         } else if (this.passForm.checkPass !== '') {
-          this.$refs.passForm.validateField('checkPass')
+          this.$refs.passFormRef.validateField('checkPass')
         }
         callback()
       }
@@ -223,18 +223,27 @@ export default {
         this.loading = false
       },
   methods: {
-    submitForm (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert('submit!')
-        } else {
-          console.log('error submit!!')
-          return false
+    submitForm () {
+      this.$refs.passFormRef.validate(async valid => {
+        if (!valid) return
+        const token = window.sessionStorage.getItem('token')
+        const { data: res } = await this.$http.post('update_password', { token: token, oldPass: this.passForm.oldPass, pass: this.passForm.pass })
+        if (res.code !== 200) return this.$message.error(res.message)
+        else {
+          if (res.data.result) {
+            this.$message({
+              message: res.data.message,
+              type: 'success'
+            })
+          } else {
+            this.$message.error(res.data.message)
+          }
+          this.resetForm()
         }
       })
     },
-    resetForm (formName) {
-      this.$refs[formName].resetFields()
+    resetForm () {
+      this.$refs.passFormRef.resetFields()
     }
   }
 }

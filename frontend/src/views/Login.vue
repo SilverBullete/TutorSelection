@@ -24,17 +24,16 @@
         class="loginForm-container"
         width="500px"
       >
-        <loginForm />
+        <transition name="main">
+          <router-view />
+        </transition>
       </el-aside>
     </el-container>
   </el-container>
 </template>
 
 <script>
-    import loginForm from '../components/LoginForm.vue'
-    export default {
-        components: { loginForm }
-    }
+
 </script>
 
 <style lang="less" scoped>

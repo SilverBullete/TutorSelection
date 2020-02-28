@@ -37,7 +37,7 @@
       </div>
       <div class="table">
         <el-table
-          :data="tableData"
+          :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
           stripe
           style="width: 100%"
           max-height="600"
@@ -95,6 +95,7 @@
                 v-if="select[0] === scope.row.id"
                 size="mini"
                 type="primary"
+                @click="revoke(scope.row)"
               >
                 第一导师
               </el-button>
@@ -103,7 +104,7 @@
                 size="mini"
                 type="primary"
                 plain
-                @click="first(scope.$index, scope.row)"
+                @click="first(scope.row)"
               >
                 第一导师
               </el-button>
@@ -111,6 +112,7 @@
                 v-if="select[1] === scope.row.id"
                 size="mini"
                 type="info"
+                @click="revoke(scope.row)"
               >
                 第二导师
               </el-button>
@@ -119,7 +121,7 @@
                 size="mini"
                 type="info"
                 plain
-                @click="second(scope.$index, scope.row)"
+                @click="second(scope.row)"
               >
                 第二导师
               </el-button>
@@ -157,8 +159,8 @@ export default {
     const _this = this
     const token = window.sessionStorage.getItem('token')
     this.$http.post('student/get_teachers', { token: token }).then(function (res) {
-      _this.select = [res.data.data.select[0].id, res.data.data.select[1].id]
-      _this.tableData = res.data.data.select.concat(res.data.data.teachers)
+      _this.select = [res.data.data.select[0], res.data.data.select[1]]
+      _this.tableData = res.data.data.teachers
       _this.options = res.data.data.options
     })
     this.loading = false
@@ -171,8 +173,37 @@ export default {
         }
       })
     },
-    first (index, row) {
-      this.$confirm('你确定选择' + row.name + '老师替代' + this.tableData[0].name + '老师作为你的第一志愿导师吗？', '提示', {
+    updateData () {
+      console.log(this.select)
+      const nodes = this.$refs.myCascader.getCheckedNodes(true)
+      const institutes = []
+      nodes.forEach(node => {
+        institutes.push(node.value)
+      })
+      const _this = this
+      const token = window.sessionStorage.getItem('token')
+      if (institutes.length) {
+        this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
+        _this.tableData = res.data.data.teachers
+      }) 
+      } else {
+        this.$http.post('student/get_teachers', { token: token, select: this.select }).then(function (res) {
+          _this.tableData = res.data.data.teachers
+        })
+      }
+    },
+    first (row) {
+      var message = ''
+      var change = false
+      if (row.id === this.select[1]) {
+        message = '你已选择' + row.name + '老师作为你的第二志愿导师，是否将其替换为第一志愿导师？'
+        change = true
+      } else if (this.select[0]) {
+        message = '你确定选择' + row.name + '老师替代' + this.tableData[0].name + '老师作为你的第一志愿导师吗？'
+      } else {
+        message = '你确定选择' + row.name + '老师作为你的第一志愿导师吗？'
+      }
+      this.$confirm(message, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -181,23 +212,15 @@ export default {
             type: 'success',
             message: '选择成功！注意提交保存修改！'
           })
-          this.select[0] = row.id
-          const nodes = this.$refs.myCascader.getCheckedNodes(true)
-          const institutes = []
-          nodes.forEach(node => {
-            institutes.push(node.value)
-          })
-          const _this = this
-          const token = window.sessionStorage.getItem('token')
-          if (institutes.length) {
-            this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
-            _this.tableData = res.data.data.teachers
-          }) 
-          } else {
-            this.$http.post('student/get_teachers', { token: token, select: this.select }).then(function (res) {
-              _this.tableData = res.data.data.select.concat(res.data.data.teachers)
-            })
+          if (change) {
+            if (this.select[0]) {
+              this.select[1] = this.select[0]
+            } else {
+              this.select[1] = ''
+            }
           }
+          this.select[0] = row.id
+          this.updateData()
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -205,8 +228,20 @@ export default {
           })          
         })
     },
-    second (index, row) {
-      this.$confirm('你确定选择' + row.name + '老师替代' + this.tableData[1].name + '老师作为你的第二志愿导师吗？', '提示', {
+    second (row) {
+      var message = ''
+      var change = false
+      if (row.id === this.select[0]) {
+        message = '你已选择' + row.name + '老师作为你的第一志愿导师，是否将其替换为第二志愿导师？'
+        change = true
+      } else if (this.select[1] && this.select[0]) {
+        message = '你确定选择' + row.name + '老师替代' + this.tableData[1].name + '老师作为你的第二志愿导师吗？'
+      } else if (this.select[1]) {
+        message = '你确定选择' + row.name + '老师替代' + this.tableData[0].name + '老师作为你的第二志愿导师吗？'
+      } else {
+        message = '你确定选择' + row.name + '老师作为你的第二志愿导师吗？'
+      }
+      this.$confirm(message, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -215,23 +250,43 @@ export default {
             type: 'success',
             message: '选择成功！注意提交保存修改！'
           })
-          this.select[1] = row.id
-          const nodes = this.$refs.myCascader.getCheckedNodes(true)
-          const institutes = []
-          nodes.forEach(node => {
-            institutes.push(node.value)
-          })
-          const _this = this
-          const token = window.sessionStorage.getItem('token')
-          if (institutes.length) {
-            this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
-            _this.tableData = res.data.data.teachers
-          }) 
-          } else {
-            this.$http.post('student/get_teachers', { token: token, select: this.select }).then(function (res) {
-              _this.tableData = res.data.data.select.concat(res.data.data.teachers)
-            })
+          if (change) {
+            if (this.select[1]) {
+              this.select[0] = this.select[1]
+            } else {
+              this.select[0] = ''
+            }
           }
+          this.select[1] = row.id
+          this.updateData()
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已撤销选择'
+          })          
+        })
+    },
+    revoke (row) {
+      var message = ''
+      var index = -1
+      if (row.id === this.select[0]) {
+        index = 0
+        message = '是否确定取消选择' + row.name + '老师作为你的第一志愿导师'
+      } else {
+        index = 1
+        message = '是否确定取消选择' + row.name + '老师作为你的第二志愿导师'
+      }
+      this.$confirm(message, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '选择成功！注意提交保存修改！'
+          })
+          this.select[index] = '' 
+          this.updateData()
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -240,7 +295,17 @@ export default {
         })
     },
     submit () {
-
+      const token = window.sessionStorage.getItem('token')
+      this.$http.post('student/update_selection', { token: token, select: this.select }).then(function (res) {
+        if (res.data.data.result) {
+          this.$message({
+            type: 'success',
+            message: res.data.data.message
+          })
+        } else {
+          this.$message.error('修改失败')
+        }
+      }) 
     },
     change (items) {
       const tags = []
@@ -253,12 +318,12 @@ export default {
       const _this = this
       const token = window.sessionStorage.getItem('token')
       if (institutes.length) {
-      this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
-        _this.tableData = res.data.data.teachers
-      }) 
+        this.$http.post('student/get_teachers_by_institute', { token: token, institutes: institutes, select: this.select }).then(function (res) {
+          _this.tableData = res.data.data.teachers
+        }) 
       } else {
         this.$http.post('student/get_teachers', { token: token, select: this.select }).then(function (res) {
-          _this.tableData = res.data.data.select.concat(res.data.data.teachers)
+          _this.tableData = res.data.data.teachers
         })
       }
     }

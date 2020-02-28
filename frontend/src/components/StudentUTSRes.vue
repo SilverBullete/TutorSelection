@@ -93,11 +93,11 @@
 
 <script>
 export default {
-    data () {
-      return {
-        resultData: []
-      }
-    },
+  data () {
+    return {
+      resultData: []
+    }
+  },
   created () {
         this.loading = true
         const _this = this

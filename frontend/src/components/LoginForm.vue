@@ -56,7 +56,7 @@ export default {
       loginForm: {
         type: '学生',
         id: '201700000000',
-        password: '123456'
+        password: '123456qaz'
       },
       loginFormRules: {
         id: [
@@ -69,15 +69,6 @@ export default {
       }
     }
   },
-  created () {
-        this.loading = true
-        const _this = this
-        this.$http.post('/api/main/tips').then(function (res) {
-          _this.tip = res.body.data.tip.content
-        })
-        this.data = this.$route.params.data.body.data
-        this.loading = false
-      },
   methods: {
     login () {
       this.$refs.loginFormRef.validate(async valid => {
@@ -86,6 +77,7 @@ export default {
         const { data: res } = await this.$http.post('login', this.loginForm)
         if (res.code !== 200) return this.$message.error(res.message)
         window.sessionStorage.setItem('token', res.data.token)
+        if (this.loginForm.password.length < 8) return this.$router.push('/password')
         if (res.data.type === 'student') return this.$router.push('/student')
       })
     }

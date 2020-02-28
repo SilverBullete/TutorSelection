@@ -78,57 +78,125 @@ def get_user_info(request):
         return APIServerError("error")
 
 
+def update_password(request):
+    request_post = json.loads(request.body)
+    token = request_post['token']
+    old_pass = request_post['oldPass']
+    new_pass = request_post['pass']
+    data = check_token(token)
+    if data['res']:
+        user_type = data['type']
+        if user_type == 'student':
+            student = Student.objects.get(id=data['id'])
+            if validate_password(student.password, old_pass):
+                student.password = encrypt_password(new_pass)
+                student.save()
+                return APIResult({
+                    'result': True,
+                    'message': '修改密码成功'
+                })
+            else:
+                return APIResult({
+                    'result': False,
+                    'message': '密码错误'
+                })
+
+
+def get_student_resume(request):
+    request_post = json.loads(request.body)
+    token = request_post['token']
+    data = check_token(token)
+    if data['res']:
+        student = Student.objects.get(id=data['id'])
+        return APIResult({
+            "id": student.id,
+            "gpa": student.gpa,
+            "rank": student.rank,
+            "profile": student.profile,
+            "award": student.award,
+            "agreeDistribution": student.agree_distribution,
+            # 待补充头像不存在的情况
+            "avatar": "http://localhost:8001" + student.avatar.url
+        })
+    else:
+        return APIServerError("error")
+
+
+def update_resume(request):
+    request_post = json.loads(request.body)
+    token = request_post['token']
+    form = request_post['form']
+    data = check_token(token)
+    if data['res']:
+        student = Student.objects.get(id=data['id'])
+        student.gpa = form['gpa']
+        student.rank = form['rank']
+        student.agree_distribution = form['agreeDistribution']
+        student.profile = form['profile']
+        student.award = form['award']
+        student.save()
+        return APIResult({
+            'result': True,
+            'message': '修改简历成功'
+        })
+    else:
+        return APIResult({
+            'result': False,
+            'message': '修改简历错误'
+        })
+
+
 def get_teachers(request):
     request_post = json.loads(request.body)
     token = request_post['token']
-    try:
+    if 'select' in request_post:
         select = request_post['select']
-    except:
+    else:
         select = None
     data = check_token(token)
     if data['res']:
-        res = [None, None]
+        res = ["", ""]
         ids = []
+        teachers_res = []
         if not select:
             selections = Selection.objects.filter(student_id=data['id'])
             for selection in selections:
                 ids.append(selection.teacher.id)
                 if selection.is_first:
-                    res[0] = {
-                        "type": "第一志愿",
+                    res[0] = selection.teacher.id
+                    teachers_res.insert(0, {
                         "id": selection.teacher.id,
                         "name": selection.teacher.name,
                         "college": selection.teacher.college,
                         "institute": selection.teacher.institute,
                         "subject": selection.teacher.subject,
-                        "profile": selection.teacher.profile,
-                        "pass_status": selection.pass_status
-                    }
+                        "profile": selection.teacher.profile
+                    })
                 else:
-                    res[1] = {
-                        "type": "第二志愿",
+                    res[1] = selection.teacher.id
+                    teachers_res.append({
                         "id": selection.teacher.id,
                         "name": selection.teacher.name,
                         "college": selection.teacher.college,
                         "institute": selection.teacher.institute,
                         "subject": selection.teacher.subject,
-                        "profile": selection.teacher.profile,
-                        "pass_status": selection.pass_status
-                    }
+                        "profile": selection.teacher.profile
+                    })
         else:
             for i, j in enumerate(select):
-                teacher = Teacher.objects.get(id=j)
-                res[i] = {
-                    "id": teacher.id,
-                    "name": teacher.name,
-                    "college": teacher.college,
-                    "institute": teacher.institute,
-                    "subject": teacher.subject,
-                    "profile": teacher.profile
-                }
-                ids = select
+                if j:
+                    teacher = Teacher.objects.get(id=j)
+                    res[i] = teacher.id
+                    teachers_res.append({
+                        "id": teacher.id,
+                        "name": teacher.name,
+                        "college": teacher.college,
+                        "institute": teacher.institute,
+                        "subject": teacher.subject,
+                        "profile": teacher.profile
+                    })
+                    ids = select
         teachers = Teacher.objects.all()
-        teachers_res = []
         for teacher in teachers:
             if teacher.id not in ids:
                 teachers_res.append({
@@ -157,15 +225,16 @@ def get_teachers_by_institute(request):
         teachers = Teacher.objects.filter(institute__in=institutes)
         teachers_res = []
         for i in select:
-            teacher = Teacher.objects.get(id=i)
-            teachers_res.append({
-                "id": teacher.id,
-                "name": teacher.name,
-                "college": teacher.college,
-                "institute": teacher.institute,
-                "subject": teacher.subject,
-                "profile": teacher.profile
-            })
+            if i:
+                teacher = Teacher.objects.get(id=i)
+                teachers_res.append({
+                    "id": teacher.id,
+                    "name": teacher.name,
+                    "college": teacher.college,
+                    "institute": teacher.institute,
+                    "subject": teacher.subject,
+                    "profile": teacher.profile
+                })
         for teacher in teachers:
             if teacher.id not in select:
                 teachers_res.append({
@@ -188,13 +257,31 @@ def update_selection(request):
     select = request_post['select']
     data = check_token(token)
     if data['res']:
-        selections = Selection.objects.filter(student_id=data['id'])
-        if len(selections) == 0:
-            for i, j in enumerate(select):
+        if select[0]:
+            selection = Selection.objects.filter(student_id=data['id'], is_first=True)
+            if selection:
+                selection = selection.first()
+                selection.teacher = Teacher.objects.get(id=select[0])
+                selection.save()
+            else:
                 Selection.objects.create(student=Student.objects.get(id=data['id']),
-                                         teacher=Teacher.objects.get(id=j),
-                                         is_first=(i == 0),
-                                         )
+                                         teacher=Teacher.objects.get(id=select[0]),
+                                         is_first=True)
+        if select[1]:
+            selection = Selection.objects.filter(student_id=data['id'], is_first=False)
+            if selection:
+                selection = selection.first()
+                selection.teacher = Teacher.objects.get(id=select[1])
+                selection.save()
+            else:
+                Selection.objects.create(student=Student.objects.get(id=data['id']),
+                                         teacher=Teacher.objects.get(id=select[1]),
+                                         is_first=False)
+        return APIResult({
+            "result": True,
+            "message": "修改成功"
+        })
+    return APIServerError({"message": data['message']})
 
 
 def get_selection_result(request):

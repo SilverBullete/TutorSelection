@@ -4,7 +4,7 @@ import {
     Message, Container, Header, Aside, Main, Carousel, CarouselItem,
     Menu, Submenu, MenuItemGroup, MenuItem, Row, Col, Cascader, Table,
     TableColumn, Tag, MessageBox, Scrollbar, Divider, Link, Breadcrumb,
-    BreadcrumbItem, Tabs, TabPane, Image
+    BreadcrumbItem, Tabs, TabPane, Image, Switch
 } from 'element-ui'
 
 Vue.use(Button)
@@ -41,3 +41,4 @@ Vue.use(BreadcrumbItem)
 Vue.use(Tabs)
 Vue.use(TabPane)
 Vue.use(Image)
+Vue.use(Switch)

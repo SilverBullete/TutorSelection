@@ -24,11 +24,7 @@
 
 <script>
     import studentAside from '../components/Aside.vue'
-    import studentInfo from '../components/StudentInfo'
-    import studentResume from '../components/StudentResume'
-    import studentUTS from '../components/StudentUTS'
-    import studentUTSRes from '../components/StudentUTSRes'
-    import announcement from '../components/Announcement'
+
     export default {
         components: { studentAside },
         data: function () {
