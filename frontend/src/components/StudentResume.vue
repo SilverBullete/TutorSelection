@@ -177,12 +177,7 @@ export default {
   width: 80%;
   // margin-left: 15%;
 }
-.switch{
-  > .el-form-item__content{
-    left: 20px;
-    text-align: left;
-  }
-}
+
 .el-image{
   width: 200px;
 }
@@ -190,5 +185,13 @@ export default {
   position: absolute;
   bottom: 0;
   right: 48px;
+}
+</style>
+<style lang="less">
+.switch{
+  > .el-form-item__content{
+    left: 20px;
+    text-align: left;
+  }
 }
 </style>

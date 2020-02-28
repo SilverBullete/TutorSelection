@@ -93,7 +93,8 @@ def update_password(request):
                 student.save()
                 return APIResult({
                     'result': True,
-                    'message': '修改密码成功'
+                    'message': '修改密码成功',
+                    'type': 'student'
                 })
             else:
                 return APIResult({
