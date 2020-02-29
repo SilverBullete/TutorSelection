@@ -216,7 +216,7 @@ export default {
         this.loading = true
         const _this = this
         const token = window.sessionStorage.getItem('token')
-        this.$http.post('student/get_info', { token: token }).then(function (res) {
+        this.$http.post('get_info', { token: token }).then(function (res) {
           _this.student = res.data.data
           _this.src = res.data.data.avatar
         })

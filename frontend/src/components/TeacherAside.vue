@@ -12,7 +12,7 @@
     >
       <el-menu-item
         index="1"
-        :route="{name:'s_announcement'}"
+        :route="{name:'t_announcement'}"
       >
         <template slot="title">
           <i class="el-icon-message" />公告
@@ -25,13 +25,13 @@
         <el-menu-item-group>
           <el-menu-item
             index="2-1"
-            :route="{name:'s_info'}"
+            :route="{name:'t_info'}"
           >
             个人基本信息
           </el-menu-item>
           <el-menu-item
             index="2-2"
-            :route="{name:'s_resume'}"
+            :route="{name:'t_resume'}"
           >
             个人简历
           </el-menu-item>
@@ -44,13 +44,13 @@
         <el-menu-item-group>
           <el-menu-item
             index="3-1"
-            :route="{name:'s_select'}"
+            :route="{name:'t_select'}"
           >
-            导师选择
+            学生选择
           </el-menu-item>
           <el-menu-item
             index="3-2"
-            :route="{name:'s_result'}"
+            :route="{name:'t_result'}"
           >
             选择情况
           </el-menu-item>
@@ -63,13 +63,13 @@
         <el-menu-item-group>
           <el-menu-item
             index="4-1"
-            :route="{name:'s_gd_select'}"
+            :route="{name:'t_gd_select'}"
           >
-            导师选择
+            学生选择
           </el-menu-item>
           <el-menu-item
             index="4-2"
-            :route="{name:'s_gd_result'}"
+            :route="{name:'t_gd_result'}"
           >
             选择情况
           </el-menu-item>

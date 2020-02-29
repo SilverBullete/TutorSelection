@@ -1,7 +1,10 @@
 import json
 
+from io import StringIO
+from xlwt import *
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models import ObjectDoesNotExist
+from django.http import HttpResponse
 
 from .models import Student, Teacher, Administrator, Selection, Publicity, OpeningTime, File
 from .response import APIResult, APIServerError
@@ -62,18 +65,30 @@ def get_user_info(request):
     token = request_post['token']
     data = check_token(token)
     if data['res']:
-        student = Student.objects.get(id=data['id'])
-        return APIResult({
-            "name": student.name,
-            "id": student.id,
-            "gender": "男" if not student.gender else "女",
-            "grade": student.grade,
-            "college": student.college,
-            "subject": student.subject,
-            "class_name": student.class_name,
-            # 待补充头像不存在的情况
-            "avatar": "http://localhost:8001" + student.avatar.url
-        })
+        if data['type'] == 'student':
+            student = Student.objects.get(id=data['id'])
+            return APIResult({
+                "name": student.name,
+                "id": student.id,
+                "gender": "男" if not student.gender else "女",
+                "grade": student.grade,
+                "college": student.college,
+                "subject": student.subject,
+                "class_name": student.class_name,
+                # 待补充头像不存在的情况
+                "avatar": "http://localhost:8001" + student.avatar.url
+            })
+        elif data['type'] == 'teacher':
+            teacher = Teacher.objects.get(id=data['id'])
+            return APIResult({
+                "name": teacher.name,
+                "id": teacher.id,
+                "gender": "男" if not teacher.gender else "女",
+                "college": teacher.college,
+                "institute": teacher.institute,
+                "subject": teacher.subject,
+                "avatar": "http://localhost:8001" + teacher.avatar.url
+            })
     else:
         return APIServerError("error")
 
@@ -101,6 +116,23 @@ def update_password(request):
                     'result': False,
                     'message': '密码错误'
                 })
+        elif user_type == 'teacher':
+            teacher = Teacher.objects.get(id=data['id'])
+            if validate_password(teacher.password, old_pass):
+                teacher.password = encrypt_password(new_pass)
+                teacher.save()
+                return APIResult({
+                    'result': True,
+                    'message': '修改密码成功',
+                    'type': 'teacher'
+                })
+            else:
+                return APIResult({
+                    'result': False,
+                    'message': '密码错误'
+                })
+    else:
+        return APIServerError("error")
 
 
 def get_student_resume(request):
@@ -319,6 +351,48 @@ def get_selection_result(request):
 
 def get_announcement(request):
     pass
+
+
+def export_excel(request):
+    request_post = json.loads(request.body)
+    token = request_post['token']
+    data = check_token(token)
+    if data['res']:
+        selections = Selection.objects.filter(teacher_id=data['id'])
+        if selections:
+            excel = Workbook(encoding='utf-8')
+            sheet = excel.add_sheet('本科学生列表')
+            header = ['学号', '姓名', '性别', '年级', '学院', '专业', '班级', '绩点', '绩点排名', '个人简介', '获奖情况', '志愿']
+            for index, value in enumerate(header):
+                sheet.write(0, index, value)
+            row = 1
+            for selection in selections:
+                student = selection.student
+                excel_data = [
+                    student.id,
+                    student.name,
+                    "男" if not student.gender else "女",
+                    student.grade,
+                    student.college,
+                    student.subject,
+                    student.class_name,
+                    student.gpa,
+                    student.rank,
+                    student.profile,
+                    student.award,
+                    "第一志愿" if selection.is_first else "第二志愿"
+                ]
+                for index, value in enumerate(excel_data):
+                    sheet.write(row, index, value)
+                row += 1
+            output = StringIO()
+            excel.save(output)
+            output.seek(0)
+            response = HttpResponse(output.getvalue(), content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment;filename=学生选择信息表.xls'
+            response.write(output.getvalue())
+            return response
+    return HttpResponse("无数据")
 
 
 def check_token(token):
