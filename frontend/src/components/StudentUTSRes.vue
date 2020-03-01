@@ -64,14 +64,14 @@
         >
           <template slot-scope="scope">
             <el-tag
-              v-if="scope.row.pass_status==0"
+              v-if="scope.row.pass_status==1"
               type="info"
               effect="dark"
             >
               待通过
             </el-tag>
             <el-tag
-              v-if="scope.row.pass_status==1"
+              v-if="scope.row.pass_status==0"
               type="success"
               effect="dark"
             >
@@ -102,7 +102,7 @@ export default {
         this.loading = true
         const _this = this
         const token = window.sessionStorage.getItem('token')
-        this.$http.post('student/get_selection_res', { token: token }).then(function (res) {
+        this.$http.post('get_selection_res', { token: token }).then(function (res) {
           _this.resultData = res.data.data
         })
         this.loading = false

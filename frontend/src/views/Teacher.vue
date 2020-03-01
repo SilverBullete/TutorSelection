@@ -23,16 +23,16 @@
 </template>
 
 <script>
-    import teacherAside from '../components/TeacherAside.vue'
+import teacherAside from '../components/TeacherAside.vue'
 
-    export default {
-        components: { teacherAside },
-        data: function () {
-            return {
-                
-            }
+export default {
+    components: { teacherAside },
+    data: function () {
+        return {
+            
         }
     }
+}
 </script>
 
 <style lang="less" scoped>

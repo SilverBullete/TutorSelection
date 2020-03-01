@@ -19,6 +19,7 @@ import announcement from '../components/Announcement'
 
 // teacher界面
 import teacherUTS from '../components/TeacherUTS'
+import teacherUTSRes from '../components/TeacherUTSRes'
 
 Vue.use(VueRouter)
 
@@ -96,7 +97,7 @@ const routes = [
       }, {
         path: 'result',
         name: 't_result',
-        component: studentUTSRes
+        component: teacherUTSRes
       }, {
         path: 'announcement',
         name: 't_announcement',

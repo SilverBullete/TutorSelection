@@ -1,14 +1,21 @@
 import json
+import datetime
 
-from io import StringIO
+from io import BytesIO
 from xlwt import *
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models import ObjectDoesNotExist
 from django.http import HttpResponse
+from django.utils.http import urlquote
 
 from .models import Student, Teacher, Administrator, Selection, Publicity, OpeningTime, File
 from .response import APIResult, APIServerError
 from .encryption import encrypt_password, certify_token, generate_token, validate_password
+
+MAX_NUM = 8
+PASSING = 0
+PENDING = 1
+NOT_PASSING = 2
 
 
 @require_POST
@@ -322,30 +329,49 @@ def get_selection_result(request):
     token = request_post['token']
     data = check_token(token)
     if data['res']:
-        selections = Selection.objects.filter(student_id=data['id'])
-        res = []
-        for selection in selections:
-            if selection.is_first:
-                res.insert(0, {
-                    "type": "第一志愿",
-                    "name": selection.teacher.name,
-                    "college": selection.teacher.college,
-                    "institute": selection.teacher.institute,
-                    "subject": selection.teacher.subject,
-                    "profile": selection.teacher.profile,
-                    "pass_status": selection.pass_status
-                })
-            else:
+        if data['type'] == 'student':
+            selections = Selection.objects.filter(student_id=data['id'])
+            res = []
+            for selection in selections:
+                if selection.is_first:
+                    res.insert(0, {
+                        "type": "第一志愿",
+                        "name": selection.teacher.name,
+                        "college": selection.teacher.college,
+                        "institute": selection.teacher.institute,
+                        "subject": selection.teacher.subject,
+                        "profile": selection.teacher.profile,
+                        "pass_status": selection.pass_status
+                    })
+                else:
+                    res.append({
+                        "type": "第二志愿",
+                        "name": selection.teacher.name,
+                        "college": selection.teacher.college,
+                        "institute": selection.teacher.institute,
+                        "subject": selection.teacher.subject,
+                        "profile": selection.teacher.profile,
+                        "pass_status": selection.pass_status
+                    })
+            return APIResult(res)
+        elif data['type'] == 'teacher':
+            selections = Selection.objects.filter(teacher_id=data['id'], pass_status=PASSING)
+            res = []
+            for selection in selections:
+                student = selection.student
                 res.append({
-                    "type": "第二志愿",
-                    "name": selection.teacher.name,
-                    "college": selection.teacher.college,
-                    "institute": selection.teacher.institute,
-                    "subject": selection.teacher.subject,
-                    "profile": selection.teacher.profile,
+                    "id": student.id,
+                    "name": student.name,
+                    "college": student.college,
+                    "subject": student.subject,
+                    "gpa": student.gpa,
+                    "profile": student.profile,
+                    "award": student.award,
+                    "type": selection.is_first,
+                    "avatar": "http://localhost:8001" + student.avatar.url,
                     "pass_status": selection.pass_status
                 })
-        return APIResult(res)
+            return APIResult(res)
     return APIServerError({"message": data['message']})
 
 
@@ -353,9 +379,131 @@ def get_announcement(request):
     pass
 
 
-def export_excel(request):
+def get_students(request):
     request_post = json.loads(request.body)
     token = request_post['token']
+    data = check_token(token)
+    if data['res']:
+        student_res = []
+        select = []
+        un_select = []
+        selections = Selection.objects.filter(teacher_id=data['id']).order_by('pass_status')
+        for selection in selections:
+            if not selection.pass_status:
+                select.append(selection.student.id)
+            elif selection.pass_status == NOT_PASSING:
+                un_select.append(selection.student.id)
+            student = selection.student
+            student_res.append({
+                "id": student.id,
+                "name": student.name,
+                "college": student.college,
+                "subject": student.subject,
+                "gpa": student.gpa,
+                "rank": student.rank,
+                "profile": student.profile,
+                "award": student.award,
+                "type": selection.is_first,
+                "passStatus": selection.pass_status,
+                "avatar": "http://localhost:8001" + student.avatar.url
+            })
+        return APIResult({
+            "select": select,
+            "unSelect": un_select,
+            "students": student_res,
+            "maxNum": MAX_NUM
+        })
+    return APIServerError({"message": data['message']})
+
+
+def update_students_list(request):
+    request_post = json.loads(request.body)
+    token = request_post['token']
+    select = request_post['select']
+    un_select = request_post['unSelect']
+    data = check_token(token)
+    if data['res']:
+        student_res = []
+        for i in select:
+            student = Student.objects.get(id=i)
+            selection = Selection.objects.get(student_id=i, teacher_id=data['id'])
+            student_res.append({
+                "id": student.id,
+                "name": student.name,
+                "college": student.college,
+                "subject": student.subject,
+                "gpa": student.gpa,
+                "rank": student.rank,
+                "profile": student.profile,
+                "award": student.award,
+                "type": selection.is_first,
+                "passStatus": selection.pass_status,
+                "avatar": "http://localhost:8001" + student.avatar.url
+            })
+        selections = Selection.objects.filter(teacher_id=data['id']).order_by('pass_status')
+        for selection in selections:
+            student = selection.student
+            if student.id not in select + un_select:
+                student_res.append({
+                    "id": student.id,
+                    "name": student.name,
+                    "college": student.college,
+                    "subject": student.subject,
+                    "gpa": student.gpa,
+                    "rank": student.rank,
+                    "profile": student.profile,
+                    "award": student.award,
+                    "type": selection.is_first,
+                    "passStatus": selection.pass_status,
+                    "avatar": "http://localhost:8001" + student.avatar.url
+                })
+        for i in un_select:
+            student = Student.objects.get(id=i)
+            selection = Selection.objects.get(student_id=i, teacher_id=data['id'])
+            student_res.append({
+                "id": student.id,
+                "name": student.name,
+                "college": student.college,
+                "subject": student.subject,
+                "gpa": student.gpa,
+                "rank": student.rank,
+                "profile": student.profile,
+                "award": student.award,
+                "type": selection.is_first,
+                "passStatus": selection.pass_status
+            })
+        return APIResult({
+            "select": select,
+            "unSelect": un_select,
+            "students": student_res
+        })
+    return APIServerError({"message": data['message']})
+
+
+def submit_selections(request):
+    request_post = json.loads(request.body)
+    token = request_post['token']
+    select = request_post['select']
+    data = check_token(token)
+    if data['res']:
+        selections = Selection.objects.filter(teacher_id=data['id'])
+        for sid in select:
+            selection = Selection.objects.filter(teacher_id=data['id'], student_id=sid).first()
+            selection.pass_status = PASSING
+            selection.save()
+        for selection in selections:
+            if selection.student_id not in select:
+                selection.pass_status = NOT_PASSING
+                selection.save()
+        return APIResult({
+            "result": True,
+            "message": "修改成功"
+        })
+    return APIServerError({"message": data['message']})
+
+
+def export_excel(request):
+    token = request.GET['token']
     data = check_token(token)
     if data['res']:
         selections = Selection.objects.filter(teacher_id=data['id'])
@@ -385,12 +533,12 @@ def export_excel(request):
                 for index, value in enumerate(excel_data):
                     sheet.write(row, index, value)
                 row += 1
-            output = StringIO()
+            output = BytesIO()
             excel.save(output)
             output.seek(0)
             response = HttpResponse(output.getvalue(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment;filename=学生选择信息表.xls'
-            response.write(output.getvalue())
+            response['Content-Disposition'] = 'attachment;filename={0}'.format(
+                urlquote("学生选择信息表{0}.xls".format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))))
             return response
     return HttpResponse("无数据")
 
