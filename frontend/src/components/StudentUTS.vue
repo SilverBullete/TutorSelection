@@ -37,7 +37,15 @@
       </div>
       <div class="table">
         <el-table
-          :data="tableData.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+          :data="tableData.filter(function(row){
+            if (!search){
+              return row
+            } else {
+              return Object.keys(row).some(function (key) {
+                return String(row[key]).toLowerCase().indexOf(search) > -1
+              })
+            }
+          })"
           stripe
           style="width: 100%"
           max-height="600"
@@ -83,11 +91,12 @@
           >
             <template
               slot="header"
+              slot-scope="scope"
             >
               <el-input
                 v-model="search"
                 size="small"
-                placeholder="搜索姓名或研究方向"
+                placeholder="搜索关键词"
               />
             </template>
             <template slot-scope="scope">
@@ -174,7 +183,6 @@ export default {
       })
     },
     updateData () {
-      console.log(this.select)
       const nodes = this.$refs.myCascader.getCheckedNodes(true)
       const institutes = []
       nodes.forEach(node => {
@@ -294,18 +302,17 @@ export default {
           })          
         })
     },
-    submit () {
+    async submit () {
       const token = window.sessionStorage.getItem('token')
-      this.$http.post('student/update_selection', { token: token, select: this.select }).then(function (res) {
-        if (res.data.data.result) {
-          this.$message({
-            type: 'success',
-            message: res.data.data.message
-          })
-        } else {
-          this.$message.error('修改失败')
-        }
-      }) 
+      const res = this.$http.post('student/update_selection', { token: token, select: this.select })
+      if (res.data.data.result) {
+        this.$message({
+          type: 'success',
+          message: res.data.data.message
+        })
+      } else {
+        this.$message.error('修改失败')
+      }
     },
     change (items) {
       const tags = []

@@ -12,6 +12,14 @@ axios.defaults.baseURL = 'http://127.0.0.1:8001/api/'
 Vue.prototype.$http = axios
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-fromurlencodeed'
 Vue.config.productionTip = false
+Vue.prototype.isInArray = function (arr, value) {
+    for (var i = 0; i < arr.length; i++) {
+        if (value === arr[i]) {
+            return true
+        }
+    }
+    return false
+}
 
 new Vue({
     router,

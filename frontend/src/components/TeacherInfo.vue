@@ -22,54 +22,32 @@
             <el-row :gutter="24">
               <el-col :span="16">
                 <el-form
-                  :model="student"
+                  :model="teacher"
                   label-width="80px"
                 >
                   <el-form-item label="姓名">
                     <el-input
-                      v-model="student.name"
-                      :disabled="true"
-                    />
-                  </el-form-item>
-                  <el-form-item label="学号">
-                    <el-input
-                      v-model="student.id"
+                      v-model="teacher.name"
                       :disabled="true"
                     />
                   </el-form-item>
                   <el-form-item label="性别">
                     <el-input
-                      v-model="student.gender"
-                      :disabled="true"
-                    />
-                  </el-form-item>
-                  <el-form-item label="年级">
-                    <el-input
-                      v-model="student.grade"
+                      v-model="teacher.gender"
                       :disabled="true"
                     />
                   </el-form-item>
                   <el-form-item label="学院">
                     <el-input
-                      v-model="student.college"
+                      v-model="teacher.college"
                       :disabled="true"
                     />
                   </el-form-item>
-                  <el-form-item label="专业">
+                  <el-form-item label="研究方向">
                     <el-input
-                      v-model="student.subject"
-                      :disabled="true"
+                      v-model="teacher.subject"
                     />
                   </el-form-item>
-                  <el-form-item label="班级">
-                    <el-input
-                      v-model="student.class_name"
-                      :disabled="true"
-                    />
-                  </el-form-item>
-                  <!-- <el-form-item label="年级">
-            <el-input v-model="student.grade" />
-          </el-form-item> -->
                 </el-form>
               </el-col>
               <el-col :span="8">
@@ -87,12 +65,13 @@
                     <i class="el-icon-picture-outline" />
                   </div>
                 </el-image>
-                <!-- <el-button
+                <el-button
                   type="primary"
                   class="btn"
+                  @click="submit"
                 >
                   提交
-                </el-button> -->
+                </el-button>
               </el-col>
             </el-row>
           </div>
@@ -193,7 +172,7 @@ export default {
     }
     return {
       src: 'https://p1.ssl.qhimg.com/t019472bb28fbb2989f.png',
-      student: {},
+      teacher: {},
       passForm: {
         oldPass: '',
         pass: '',
@@ -217,30 +196,42 @@ export default {
         const _this = this
         const token = window.sessionStorage.getItem('token')
         this.$http.post('get_info', { token: token }).then(function (res) {
-          _this.student = res.data.data
+          _this.teacher = res.data.data
           _this.src = res.data.data.avatar
         })
         this.loading = false
       },
   methods: {
-    submitForm () {
-      this.$refs.passFormRef.validate(async valid => {
-        if (!valid) return
+    async submit () {
         const token = window.sessionStorage.getItem('token')
-        const { data: res } = await this.$http.post('update_password', { token: token, oldPass: this.passForm.oldPass, pass: this.passForm.pass })
-        if (res.code !== 200) return this.$message.error(res.message)
-        else {
-          if (res.data.result) {
+        const res = await this.$http.post('update_info', { token: token, form: this.teacher })
+        if (res.data.data.result) {
             this.$message({
-              message: res.data.message,
-              type: 'success'
+                type: 'success',
+                message: res.data.data.message
             })
-          } else {
-            this.$message.error(res.data.message)
-          }
-          this.resetForm()
+            } else {
+            this.$message.error('修改失败')
         }
-      })
+    },
+    submitForm () {
+        this.$refs.passFormRef.validate(async valid => {
+            if (!valid) return
+            const token = window.sessionStorage.getItem('token')
+            const { data: res } = await this.$http.post('update_password', { token: token, oldPass: this.passForm.oldPass, pass: this.passForm.pass })
+            if (res.code !== 200) return this.$message.error(res.message)
+            else {
+            if (res.data.result) {
+                this.$message({
+                message: res.data.message,
+                type: 'success'
+                })
+            } else {
+                this.$message.error(res.data.message)
+            }
+            this.resetForm()
+            }
+        })
     },
     resetForm () {
       this.$refs.passFormRef.resetFields()
@@ -301,5 +292,8 @@ div.el-tabs__item{
   position: absolute;
   bottom: 0;
   right: 48px;
+}
+.el-row{
+    height: 450px;
 }
 </style>

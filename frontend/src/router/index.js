@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/Login.vue'
-import Student from '../views/Student.vue'
+import Login from '../views/Login'
+import Student from '../views/Student'
+import Teacher from '../views/Teacher'
 
 // 登录界面
 import loginForm from '../components/LoginForm'
@@ -12,7 +13,15 @@ import studentInfo from '../components/StudentInfo'
 import studentResume from '../components/StudentResume'
 import studentUTS from '../components/StudentUTS'
 import studentUTSRes from '../components/StudentUTSRes'
+import studentGDTS from '../components/StudentGDTS'
+import studentGDTSRes from '../components/StudentGDTSRes'
 import announcement from '../components/Announcement'
+
+// teacher界面
+import teacherInfo from '../components/TeacherInfo'
+import teacherResume from '../components/TeacherResume'
+import teacherUTS from '../components/TeacherUTS'
+import teacherUTSRes from '../components/TeacherUTSRes'
 
 Vue.use(VueRouter)
 
@@ -34,7 +43,6 @@ const routes = [
       }
     ]
   },
-  
   {
     path: '/student/',
     name: 'student',
@@ -42,23 +50,59 @@ const routes = [
     children: [
       {
         path: 'info',
-        name: 'info',
+        name: 's_info',
         component: studentInfo
       }, {
         path: 'resume',
-        name: 'resume',
+        name: 's_resume',
         component: studentResume
       }, {
         path: 'select',
-        name: 'select',
+        name: 's_select',
         component: studentUTS
       }, {
         path: 'result',
-        name: 'result',
+        name: 's_result',
         component: studentUTSRes
       }, {
+        path: 'gd_select',
+        name: 's_gd_select',
+        component: studentGDTS
+      }, {
+        path: 'gd_result',
+        name: 's_gd_result',
+        component: studentGDTSRes
+      }, {
         path: 'announcement',
-        name: 'announcement',
+        name: 's_announcement',
+        component: announcement
+      }
+    ]
+  },
+  {
+    path: '/teacher/',
+    name: 'teacher',
+    component: Teacher,
+    children: [
+      {
+        path: 'info',
+        name: 't_info',
+        component: teacherInfo
+      }, {
+        path: 'resume',
+        name: 't_resume',
+        component: teacherResume
+      }, {
+        path: 'select',
+        name: 't_select',
+        component: teacherUTS
+      }, {
+        path: 'result',
+        name: 't_result',
+        component: teacherUTSRes
+      }, {
+        path: 'announcement',
+        name: 't_announcement',
         component: announcement
       }
     ]
