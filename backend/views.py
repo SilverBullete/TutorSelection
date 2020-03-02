@@ -11,6 +11,7 @@ from django.utils.http import urlquote
 from .models import Student, Teacher, Administrator, Selection, Publicity, OpeningTime, File
 from .response import APIResult, APIServerError
 from .encryption import encrypt_password, certify_token, generate_token, validate_password
+from TutorSelection.settings import MEDIA_ROOT
 
 MAX_NUM = 8
 PASSING = 0
@@ -100,6 +101,32 @@ def get_user_info(request):
         return APIServerError("error")
 
 
+def update_user_info(request):
+    request_post = json.loads(request.body)
+    token = request_post['token']
+    form = request_post['form']
+    data = check_token(token)
+    if data['res']:
+        if data['type'] == 'student':
+            student = Student.objects.get(id=data['id'])
+            return APIResult({
+                'result': True,
+                'message': '修改成功',
+                'type': 'student'
+            })
+        elif data['type'] == 'teacher':
+            teacher = Teacher.objects.get(id=data['id'])
+            teacher.subject = form['subject']
+            teacher.save()
+            return APIResult({
+                'result': True,
+                'message': '修改成功',
+                'type': 'teacher'
+            })
+    else:
+        return APIServerError("error")
+
+
 def update_password(request):
     request_post = json.loads(request.body)
     token = request_post['token']
@@ -142,22 +169,29 @@ def update_password(request):
         return APIServerError("error")
 
 
-def get_student_resume(request):
+def get_resume(request):
     request_post = json.loads(request.body)
     token = request_post['token']
     data = check_token(token)
     if data['res']:
-        student = Student.objects.get(id=data['id'])
-        return APIResult({
-            "id": student.id,
-            "gpa": student.gpa,
-            "rank": student.rank,
-            "profile": student.profile,
-            "award": student.award,
-            "agreeDistribution": student.agree_distribution,
-            # 待补充头像不存在的情况
-            "avatar": "http://localhost:8001" + student.avatar.url
-        })
+        if data['type'] == 'student':
+            student = Student.objects.get(id=data['id'])
+            return APIResult({
+                "id": student.id,
+                "gpa": student.gpa,
+                "rank": student.rank,
+                "profile": student.profile,
+                "award": student.award,
+                "agreeDistribution": student.agree_distribution,
+                # 待补充头像不存在的情况
+                "avatar": "http://localhost:8001" + student.avatar.url
+            })
+        elif data['type'] == 'teacher':
+            teacher = Teacher.objects.get(id=data['id'])
+            return APIResult({
+                "id": teacher.id,
+                "profile": teacher.profile
+            })
     else:
         return APIServerError("error")
 
@@ -377,6 +411,27 @@ def get_selection_result(request):
 
 def get_announcement(request):
     pass
+
+
+def upload_resume(request):
+    pdf = request.FILES['file']
+    ext = pdf.name.split(".")[-1]
+    token = request.POST['token']
+    data = check_token(token)
+    if data['res']:
+        if data['type'] == 'teacher':
+            file_name = '{0}/resume/{1}.{2}'.format(MEDIA_ROOT, data['id'], ext)
+            with open(file_name, 'wb') as f:
+                for file in pdf.chunks():
+                    f.write(file)
+            teacher = Teacher.objects.get(id=data['id'])
+            teacher.profile = "http://localhost:8001/media/resume/{0}.{1}".format(data['id'], ext)
+            teacher.save()
+        return APIResult({
+            "result": True,
+            "message": "上传成功",
+            "resume": "http://localhost:8001/media/resume/{0}.{1}".format(data['id'], ext)
+        })
 
 
 def get_students(request):

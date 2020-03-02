@@ -355,17 +355,16 @@ export default {
       }
       this.dialogVisible = false
     },
-    submit () {
-      this.$http.post('teacher/submit_selections', { token: this.token, select: this.select }).then(function (res) {
-        if (res.data.data.result) {
-          this.$message({
-            type: 'success',
-            message: res.data.data.message
-          })
-        } else {
-          this.$message.error('修改失败')
-        }
-      }) 
+    async submit () {
+      const res = await this.$http.post('teacher/submit_selections', { token: this.token, select: this.select })
+      if (res.data.data.result) {
+        this.$message({
+          type: 'success',
+          message: res.data.data.message
+        })
+      } else {
+        this.$message.error('修改失败')
+      }
     }
   }
 }

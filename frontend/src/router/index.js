@@ -18,6 +18,8 @@ import studentGDTSRes from '../components/StudentGDTSRes'
 import announcement from '../components/Announcement'
 
 // teacher界面
+import teacherInfo from '../components/TeacherInfo'
+import teacherResume from '../components/TeacherResume'
 import teacherUTS from '../components/TeacherUTS'
 import teacherUTSRes from '../components/TeacherUTSRes'
 
@@ -85,11 +87,11 @@ const routes = [
       {
         path: 'info',
         name: 't_info',
-        component: studentInfo
+        component: teacherInfo
       }, {
         path: 'resume',
         name: 't_resume',
-        component: studentResume
+        component: teacherResume
       }, {
         path: 'select',
         name: 't_select',

@@ -87,12 +87,12 @@
                     <i class="el-icon-picture-outline" />
                   </div>
                 </el-image>
-                <el-button
+                <!-- <el-button
                   type="primary"
                   class="btn"
                 >
                   提交
-                </el-button>
+                </el-button> -->
               </el-col>
             </el-row>
           </div>

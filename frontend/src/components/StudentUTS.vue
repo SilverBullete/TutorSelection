@@ -302,18 +302,17 @@ export default {
           })          
         })
     },
-    submit () {
+    async submit () {
       const token = window.sessionStorage.getItem('token')
-      this.$http.post('student/update_selection', { token: token, select: this.select }).then(function (res) {
-        if (res.data.data.result) {
-          this.$message({
-            type: 'success',
-            message: res.data.data.message
-          })
-        } else {
-          this.$message.error('修改失败')
-        }
-      }) 
+      const res = this.$http.post('student/update_selection', { token: token, select: this.select })
+      if (res.data.data.result) {
+        this.$message({
+          type: 'success',
+          message: res.data.data.message
+        })
+      } else {
+        this.$message.error('修改失败')
+      }
     },
     change (items) {
       const tags = []
