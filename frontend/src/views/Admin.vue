@@ -22,10 +22,10 @@
       </div>
     </el-header>
     <el-container>
-      <studentAside />
+      <adminAside />
       <el-scrollbar>
         <el-main>
-          <transition name="student">
+          <transition name="admin">
             <router-view />
           </transition>
         </el-main>
@@ -35,10 +35,10 @@
 </template>
 
 <script>
-    import studentAside from '../components/StudentAside.vue'
+    import adminAside from '../components/AdminAside.vue'
 
     export default {
-        components: { studentAside },
+        components: { adminAside },
         data: function () {
             return {
                 
@@ -47,8 +47,8 @@
         created () {
           this.loading = true
           this.get_user_type().then(
-            res => {
-              if (res !== 'student') {
+            res => { 
+              if (res !== 'admin') {
                 this.$router.push('/' + res)
               }
             }
@@ -62,6 +62,7 @@
         }
       }
     }
+    
 </script>
 
 <style lang="less" scoped>
@@ -103,4 +104,12 @@
     width: 100%;
     background-color: #F0F2F5;
 }
+</style>
+<style lang="less">
+.logout{
+  >.el-dropdown .el-icon-user{
+    font-size: 20px!important;
+  }
+}
+
 </style>

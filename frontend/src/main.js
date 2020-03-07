@@ -20,6 +20,11 @@ Vue.prototype.isInArray = function (arr, value) {
     }
     return false
 }
+Vue.prototype.get_user_type = async function () {
+    const token = window.sessionStorage.getItem('token')
+    const { data: res } = await this.$http.post('get_user_type', { token: token })
+    return res.data.type
+}
 
 new Vue({
     router,

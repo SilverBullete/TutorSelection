@@ -30,7 +30,7 @@
           v-for="tag in tags"
           :key="tag.name"
           type="info"
-          @click="open"
+          @click="open(tag.name)"
         >
           {{ tag.name }}
         </el-tag>
@@ -175,8 +175,10 @@ export default {
     this.loading = false
   },
   methods: {
-    open () {
-      this.$alert('这是一段内容', '标题名称', {
+    async open (name) {
+      const res = await this.$http.post('get_institute_info', { institute: name })
+      if (res.data.code !== 200) return this.$message.error(res.data.message)
+      this.$alert(res.data.data.info, '研究机构简介', {
         confirmButtonText: '确定',
         callback: action => {
         }
@@ -304,14 +306,18 @@ export default {
     },
     async submit () {
       const token = window.sessionStorage.getItem('token')
-      const res = this.$http.post('student/update_selection', { token: token, select: this.select })
-      if (res.data.data.result) {
+      const res = await this.$http.post('student/update_selection', { token: token, select: this.select })
+      if (res.data.code === 200) {
+        if (res.data.data.result) {
         this.$message({
           type: 'success',
           message: res.data.data.message
         })
       } else {
-        this.$message.error('修改失败')
+        this.$message.error(res.data.message)
+      }
+      } else {
+        this.$message.error(res.data.message)
       }
     },
     change (items) {

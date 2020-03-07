@@ -125,6 +125,8 @@ export default {
               type: 'success'
             })
             if (res.data.type === 'student') return this.$router.push('/student')
+            else if (res.data.type === 'teacher') return this.$router.push('/teacher')
+            else if (res.data.type === 'admin') return this.$router.push('/admin')
           } else {
             this.$message.error(res.data.message)
           }

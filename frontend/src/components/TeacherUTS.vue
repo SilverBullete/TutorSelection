@@ -168,6 +168,9 @@
               <p>姓名: <span class="info">{{ studentForm.row.name }}</span></p>
               <p>专业: <span class="info">{{ studentForm.row.subject }}</span></p>
               <p>绩点: <span class="info">{{ studentForm.row.gpa }}</span></p>
+              <p>电话: <span class="info">{{ studentForm.row.phone }}</span></p>
+              <p>邮箱: <span class="info">{{ studentForm.row.email }}</span></p>
+              <p>是否接受分配: <span class="info">{{ studentForm.row.agree_distribution }}</span></p>
             </el-col>
             <el-col :span="8">
               <el-image :src="studentForm.row.avatar">
@@ -272,8 +275,6 @@ export default {
     this.token = token
     this.$http.post('teacher/get_students', { token: token }).then(function (res) {
       _this.tableData = res.data.data.students
-      _this.select = res.data.data.select
-      _this.unSelect = res.data.data.unSelect
       _this.maxNum = res.data.data.maxNum
     })
     this.loading = false
@@ -356,7 +357,7 @@ export default {
       this.dialogVisible = false
     },
     async submit () {
-      const res = await this.$http.post('teacher/submit_selections', { token: this.token, select: this.select })
+      const res = await this.$http.post('teacher/submit_selections', { token: this.token, select: this.select, unSelect: this.unSelect })
       if (res.data.data.result) {
         this.$message({
           type: 'success',
@@ -425,6 +426,7 @@ export default {
   }
   .el-dialog__body{
     padding: 0 20px!important;
+    text-align: initial;
   }
   
 </style>

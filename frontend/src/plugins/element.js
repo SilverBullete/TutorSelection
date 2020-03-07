@@ -4,7 +4,8 @@ import {
     Message, Container, Header, Aside, Main, Carousel, CarouselItem,
     Menu, Submenu, MenuItemGroup, MenuItem, Row, Col, Cascader, Table,
     TableColumn, Tag, MessageBox, Scrollbar, Divider, Link, Breadcrumb,
-    BreadcrumbItem, Tabs, TabPane, Image, Switch, Dialog, Upload
+    BreadcrumbItem, Tabs, TabPane, Image, Switch, Dialog, Upload, DatePicker,
+    Select, Option, Loading, Dropdown, DropdownMenu, DropdownItem
 } from 'element-ui'
 
 Vue.use(Button)
@@ -44,3 +45,10 @@ Vue.use(Image)
 Vue.use(Switch)
 Vue.use(Dialog)
 Vue.use(Upload)
+Vue.use(DatePicker)
+Vue.use(Select)
+Vue.use(Option)
+Vue.use(Loading)
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)
