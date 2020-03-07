@@ -32,14 +32,14 @@
         <el-button
           v-if="!isFinished"
           type="primary"
-          @click="get_back"
+          @click="this.$router.push('/admin/admin_distribution')"
         >
           管理员分配
         </el-button>
         <el-button
           v-else=""
           type="primary"
-          @click="get_back"
+          @click="this.$router.push('/admin/announcement_public')"
         >
           进入公示阶段
         </el-button>
