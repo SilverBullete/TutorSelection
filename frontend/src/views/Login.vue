@@ -13,10 +13,13 @@
       <el-main>
         <el-carousel height="500px">
           <el-carousel-item
-            v-for="item in 4"
-            :key="item"
+            v-for="item in items"
+            :key="item.src"
           >
-            <h3 />
+            <div
+              class="zoomImage"
+              :style="{backgroundImage:'url(' + item.src + ')'}"
+            />
           </el-carousel-item>
         </el-carousel>
       </el-main>
@@ -33,7 +36,21 @@
 </template>
 
 <script>
-
+export default {
+  data: function () {
+      return {
+        items: [{
+          src: 'http://127.0.0.1:8001/media/bg/bg1.jpg'
+        }, {
+          src: 'http://127.0.0.1:8001/media/bg/bg2.jpg'
+        }, {
+          src: 'http://127.0.0.1:8001/media/bg/bg3.jpg'
+        }, {
+          src: 'http://127.0.0.1:8001/media/bg/bg4.jpg'
+        }]
+      }
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -85,4 +102,15 @@
   .el-carousel__item:nth-child(2n+1) {
      background-color: #d3dce6;
   }
+  .zoomImage{
+    width:100%;
+    height:0;
+    padding-bottom: 100%;
+    overflow:hidden;
+    background-position: center center;
+    background-repeat: no-repeat;
+    -webkit-background-size:cover;
+    -moz-background-size:cover;
+    background-size:cover;
+}
 </style>

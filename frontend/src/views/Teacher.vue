@@ -7,6 +7,17 @@
           alt=""
         >
         <span>浙江工业大学导师双向选择系统</span>
+      </div><div class="logout">
+        <el-dropdown>
+          <span class="el-dropdown-link">
+            <i class="el-icon-user" /><i class="el-icon-arrow-down el-icon--right" />
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item @click.native="logout">
+              退出登录
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
     </el-header>
     <el-container>
@@ -31,7 +42,24 @@ export default {
         return {
             
         }
-    }
+    },
+    created () {
+          this.loading = true
+          this.get_user_type().then(
+            res => {
+              if (res !== 'teacher') {
+                this.$router.push('/' + res)
+              }
+            }
+          )
+          this.loading = false 
+      },
+      methods: {
+        logout () {
+          window.sessionStorage.clear()
+          this.$router.push('/login')
+        }
+      }
 }
 </script>
 

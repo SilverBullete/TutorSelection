@@ -16,7 +16,6 @@
       <el-table
         :data="resultData"
         style="width: 100%"
-        :row-class-name="tableRowClassName"
       >
         <el-table-column
           prop="name"
@@ -26,12 +25,17 @@
         <el-table-column
           prop="college"
           label="学院"
-          min-width="180"
+          min-width="160"
         />
         <el-table-column
           prop="subject"
           label="专业"
-          min-width="120"
+          min-width="100"
+        />
+        <el-table-column
+          prop="class_name"
+          label="班级"
+          min-width="100"
         />
         <el-table-column
           label="简历"
@@ -71,6 +75,7 @@
         <el-table-column
           prop="result"
           label="状态"
+          min-width="90"
         >
           <template slot-scope="scope">
             <el-tag
@@ -112,6 +117,9 @@
               <p>姓名: <span class="info">{{ studentForm.row.name }}</span></p>
               <p>专业: <span class="info">{{ studentForm.row.subject }}</span></p>
               <p>绩点: <span class="info">{{ studentForm.row.gpa }}</span></p>
+              <p>电话: <span class="info">{{ studentForm.row.phone }}</span></p>
+              <p>邮箱: <span class="info">{{ studentForm.row.email }}</span></p>
+              <p>是否接受分配: <span class="info">{{ studentForm.row.agree_distribution }}</span></p>
             </el-col>
             <el-col :span="8">
               <el-image :src="studentForm.row.avatar">
@@ -188,20 +196,12 @@ export default {
     showDialog (row) {
         this.studentForm.row = row
         this.dialogVisible = true
-    },
-    tableRowClassName ({ row, rowIndex }) {
-        if (row.pass_status === 2) {
-            return 'warning-row'
-        } else if (row.pass_status === 1) {
-            return 'success-row'
-        }
-        return ''
-      }
     }
   }
+}
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .container{
   height: 100%;
   width: 100%;
@@ -222,12 +222,8 @@ export default {
 }
 .content{
   margin-top: 24px;
-  .el-table .warning-row {
-    background: oldlace;
-  }
-
-  .el-table .success-row {
-    background: #f0f9eb;
+  > .el-table{
+    padding: 24px;
   }
 }
 .el-image{

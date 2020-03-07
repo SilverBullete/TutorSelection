@@ -13,6 +13,9 @@
       </div>
     </div>
     <div class="content">
+      <div class="content-header">
+        您的导师为：<span>{{ teacher }}</span>
+      </div>
       <el-table
         :data="resultData"
         style="width: 100%"
@@ -21,17 +24,17 @@
         <el-table-column
           prop="type"
           label="导师志愿"
-          width="80"
+          min-width="80"
         />
         <el-table-column
           prop="name"
           label="姓名"
-          width="80"
+          min-width="60"
         />
         <el-table-column
           prop="college"
           label="学院"
-          min-width="180"
+          min-width="160"
         />
         <el-table-column
           prop="institute"
@@ -41,12 +44,12 @@
         <el-table-column
           prop="subject"
           label="研究方向"
-          min-width="220"
+          min-width="150"
         />
         <el-table-column
           prop="result"
           label="研究成果"
-          min-width="100"
+          min-width="80"
         >
           <template slot-scope="scope">
             <el-link
@@ -61,6 +64,7 @@
         <el-table-column
           prop="result"
           label="状态"
+          min-width="100"
         >
           <template slot-scope="scope">
             <el-tag
@@ -95,7 +99,8 @@
 export default {
   data () {
     return {
-      resultData: []
+      resultData: [],
+      teacher: ''
     }
   },
   created () {
@@ -103,7 +108,8 @@ export default {
         const _this = this
         const token = window.sessionStorage.getItem('token')
         this.$http.post('get_selection_res', { token: token }).then(function (res) {
-          _this.resultData = res.data.data
+          _this.resultData = res.data.data.selections
+          _this.teacher = res.data.data.teacher
         })
         this.loading = false
       },
@@ -111,7 +117,7 @@ export default {
       tableRowClassName ({ row, rowIndex }) {
         if (row.pass_status === 2) {
           return 'warning-row'
-        } else if (row.pass_status === 1) {
+        } else if (row.pass_status === 0) {
           return 'success-row'
         }
         return ''
@@ -120,7 +126,7 @@ export default {
   }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .container{
   height: 100%;
   width: 100%;
@@ -140,14 +146,23 @@ export default {
   }
 }
 .content{
+  .content-header{
+    padding: 24px 24px 0 24px;
+    text-align: left;
+  }
   margin-top: 24px;
-  .el-table .warning-row {
+  .el-table{
+    padding: 24px;
+  }
+}
+
+</style>
+<style lang="less">
+.el-table .warning-row {
     background: oldlace;
   }
 
   .el-table .success-row {
     background: #f0f9eb;
   }
-}
-
 </style>

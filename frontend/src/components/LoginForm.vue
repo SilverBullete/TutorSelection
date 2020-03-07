@@ -79,6 +79,8 @@ export default {
         window.sessionStorage.setItem('token', res.data.token)
         if (this.loginForm.password.length < 8) return this.$router.push('/password')
         if (res.data.type === 'student') return this.$router.push('/student')
+        else if (res.data.type === 'teacher') return this.$router.push('/teacher')
+        else if (res.data.type === 'admin') return this.$router.push('/admin')
       })
     }
   }
