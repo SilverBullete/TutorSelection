@@ -83,7 +83,7 @@
             type="primary"
             @click="submit"
           >
-            立即创建
+            立即发布
           </el-button>
           <el-button
             @click="preview"

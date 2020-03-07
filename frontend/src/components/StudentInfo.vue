@@ -17,11 +17,16 @@
       <el-tabs
         tab-position="left"
       >
-        <el-tab-pane label="信息管理">
+        <el-tab-pane
+          label="信息管理"
+          style="height: 1200px"
+        >
           <div class="">
             <el-row :gutter="24">
               <el-col :span="16">
                 <el-form
+                  ref="studentFormRef"
+                  :rules="studentRules"
                   :model="student"
                   label-width="80px"
                 >
@@ -67,9 +72,18 @@
                       :disabled="true"
                     />
                   </el-form-item>
-                  <!-- <el-form-item label="年级">
-            <el-input v-model="student.grade" />
-          </el-form-item> -->
+                  <el-form-item
+                    label="手机号"
+                    prop="phone"
+                  >
+                    <el-input v-model="student.phone" />
+                  </el-form-item>
+                  <el-form-item
+                    label="电子邮箱"
+                    prop="email"
+                  >
+                    <el-input v-model="student.email" />
+                  </el-form-item>
                 </el-form>
               </el-col>
               <el-col :span="8">
@@ -87,12 +101,13 @@
                     <i class="el-icon-picture-outline" />
                   </div>
                 </el-image>
-                <!-- <el-button
+                <el-button
                   type="primary"
                   class="btn"
+                  @click="submit"
                 >
                   提交
-                </el-button> -->
+                </el-button>
               </el-col>
             </el-row>
           </div>
@@ -161,6 +176,26 @@
 <script>
 export default {
   data: function () {
+    var validatePhone = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入手机号'))
+      }
+      const reg = /^1[3-578]\d{9}$/
+      if (!reg.test(value)) {
+        callback(new Error('请输入正确的手机号码'))
+      }
+      callback()
+    }
+    var validateEmail = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入电子邮箱'))
+      }
+      const reg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
+      if (!reg.test(value)) {
+        callback(new Error('请输入正确的电子邮箱'))
+      }
+      callback()
+    }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'))
@@ -192,8 +227,11 @@ export default {
       }
     }
     return {
-      src: 'https://p1.ssl.qhimg.com/t019472bb28fbb2989f.png',
-      student: {},
+      src: '',
+      student: {
+        phone: '',
+        email: ''
+      },
       passForm: {
         oldPass: '',
         pass: '',
@@ -209,6 +247,14 @@ export default {
         checkPass: [
           { validator: validatePass2, trigger: 'blur' }
         ]
+      },
+      studentRules: {
+        phone: [
+          { validator: validatePhone, trigger: 'blur' }
+        ],
+        email: [
+          { validator: validateEmail, trigger: 'blur' }
+        ]
       }
     }
   },
@@ -223,6 +269,24 @@ export default {
         this.loading = false
       },
   methods: {
+    submit () {
+      this.$refs.studentFormRef.validate(async valid => {
+        if (!valid) return
+        const token = window.sessionStorage.getItem('token')
+        const { data: res } = await this.$http.post('update_info', { token: token, form: this.student })
+        if (res.code !== 200) return this.$message.error(res.message)
+        else {
+          if (res.data.result) {
+            this.$message({
+              message: res.data.message,
+              type: 'success'
+            })
+          } else {
+            this.$message.error(res.data.message)
+          }
+        }
+      })
+    },
     submitForm () {
       this.$refs.passFormRef.validate(async valid => {
         if (!valid) return
@@ -280,9 +344,8 @@ export default {
   // margin-left: 15%;
 }
 .el-tabs{
-  height: 450px;
-  min-height: 200px;
-  max-height: 450px;
+  min-height: 300px;
+  max-height: 600px;
 }
 div.el-tabs__item{
   width: 224px!important;

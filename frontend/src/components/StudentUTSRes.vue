@@ -146,6 +146,7 @@ export default {
   }
 }
 .content{
+  background-color: #ffffff;
   .content-header{
     padding: 24px 24px 0 24px;
     text-align: left;

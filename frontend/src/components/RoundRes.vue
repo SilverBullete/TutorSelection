@@ -133,7 +133,7 @@
           </el-table-column>
           <el-table-column
             align="right"
-            min-width="180"
+            min-width="160"
           >
             <template
               slot="header"

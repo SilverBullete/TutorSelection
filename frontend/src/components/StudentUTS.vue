@@ -106,7 +106,7 @@
                 type="primary"
                 @click="revoke(scope.row)"
               >
-                第一导师
+                第一志愿
               </el-button>
               <el-button
                 v-else=""
@@ -115,7 +115,7 @@
                 plain
                 @click="first(scope.row)"
               >
-                第一导师
+                第一志愿
               </el-button>
               <el-button
                 v-if="select[1] === scope.row.id"
@@ -123,7 +123,7 @@
                 type="info"
                 @click="revoke(scope.row)"
               >
-                第二导师
+                第二志愿
               </el-button>
               <el-button
                 v-else=""
@@ -132,7 +132,7 @@
                 plain
                 @click="second(scope.row)"
               >
-                第二导师
+                第二志愿
               </el-button>
             </template>
           </el-table-column>

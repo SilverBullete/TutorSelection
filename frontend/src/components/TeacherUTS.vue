@@ -391,6 +391,7 @@ export default {
   }
 }
 .content{
+  margin-top: 24px;
   // margin: 0 -24px;
   background-color: #ffffff;
   .table{

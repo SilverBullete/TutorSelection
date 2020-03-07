@@ -99,7 +99,9 @@ def get_user_info(request):
                 "subject": student.subject,
                 "class_name": student.class_name,
                 # 待补充头像不存在的情况
-                "avatar": "http://localhost:8001" + student.avatar.url
+                "avatar": "http://localhost:8001" + student.avatar.url,
+                "phone": student.phone,
+                "email": student.email
             })
         elif data['type'] == 'teacher':
             teacher = Teacher.objects.get(id=data['id'])
@@ -125,6 +127,9 @@ def update_user_info(request):
     if data['res']:
         if data['type'] == 'student':
             student = Student.objects.get(id=data['id'])
+            student.phone = form['phone']
+            student.email = form['email']
+            student.save()
             return APIResult({
                 'result': True,
                 'message': '修改成功',
@@ -548,7 +553,7 @@ def submit_announcement(request):
     if data['res']:
         if data['type'] == 'admin':
             admin = Administrator.objects.get(username=data['id'])
-            content = str(form['content'].strip("").replace(u'\u3000',u' ').split("\n"))
+            content = str(form['content'].strip("").replace(u'\u3000', u' ').split("\n"))
             if form['type'] == 2:
                 Publicity.objects.create(grade=admin.grade, title=form['title'],
                                          admin=admin, publicity_type=int(form['type']),
@@ -790,7 +795,7 @@ def get_all_students(request):
                     "email": student.email,
                     "agree_distribution": "是" if student.agree_distribution else "否"
                 }
-                selections = Selection.objects.filter(student_id=student.id)
+                selections = Selection.objects.filter(student_id=student.id, round=student.get_round())
                 for selection in selections:
                     if selection.is_first:
                         temp['first_aspiration'] = selection.teacher.name
