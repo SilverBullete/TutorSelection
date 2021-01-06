@@ -3,7 +3,7 @@ cryptography==2.8
 Django==2.2.10
 django-cors-headers==3.2.1
 mysqlclient==1.4.6
-Pillow==7.0.0
+Pillow==7.1.0
 pycparser==2.19
 pycryptodomex==3.9.7
 PyJWT==1.7.1
