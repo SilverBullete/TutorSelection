@@ -73,7 +73,6 @@ export default {
     login () {
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
-        this.$http.get('create')
         const { data: res } = await this.$http.post('login', this.loginForm)
         if (res.code !== 200) return this.$message.error(res.message)
         window.sessionStorage.setItem('token', res.data.token)

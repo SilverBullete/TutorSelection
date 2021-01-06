@@ -363,6 +363,7 @@ export default {
           type: 'success',
           message: res.data.data.message
         })
+        location.reload();
       } else {
         this.$message.error('修改失败')
       }

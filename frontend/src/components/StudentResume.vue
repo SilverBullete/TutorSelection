@@ -105,7 +105,7 @@ export default {
         callback()
       }
     return {
-      src: 'https://p1.ssl.qhimg.com/t019472bb28fbb2989f.png',
+      src: '',
       student: {},
       resumeFormRules: {
         gpa: [

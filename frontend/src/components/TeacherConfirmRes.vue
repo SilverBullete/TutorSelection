@@ -325,17 +325,25 @@ export default {
       const _this = this
       const token = window.sessionStorage.getItem('token')
       this.$http.post('admin/get_no_action_teachers', { token: token }).then(function (res) {
-        _this.tableData = res.data.data.teachers
-        _this.teacherTable = true
+        if(res.data.code==500){
+            _this.$message.error(res.data.message);
+          }else{
+          _this.tableData = res.data.data.teachers;
+          _this.teacherTable = true
+        }
       })
     }, 
     get_back () {
       const _this = this
       const token = window.sessionStorage.getItem('token')
       this.$http.post('admin/get_teacher_confirm_res', { token: token }).then(function (res) {
-        _this.tableData = res.data.data.students
-        _this.teacherTable = false
-        _this.isFinished = res.data.data.isFinished
+        if(res.data.code==500){
+            _this.$message.error(res.data.message);
+          }else{
+          _this.tableData = res.data.data.students
+          _this.teacherTable = false
+          _this.isFinished = res.data.data.isFinished
+        }
       })
     }
   }

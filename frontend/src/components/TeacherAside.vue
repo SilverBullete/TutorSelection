@@ -56,7 +56,7 @@
           </el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-      <el-submenu index="4">
+      <!-- <el-submenu index="4">
         <template slot="title">
           <i class="el-icon-s-order" />毕页设计导师选择
         </template>
@@ -74,7 +74,7 @@
             选择情况
           </el-menu-item>
         </el-menu-item-group>
-      </el-submenu>
+      </el-submenu> -->
     </el-menu>
   </el-aside>
 </template>

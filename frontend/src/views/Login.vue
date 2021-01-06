@@ -11,7 +11,7 @@
     </el-header>
     <el-container>
       <el-main>
-        <el-carousel height="500px">
+        <el-carousel height="800px">
           <el-carousel-item
             v-for="item in items"
             :key="item.src"

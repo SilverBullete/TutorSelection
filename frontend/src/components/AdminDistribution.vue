@@ -130,7 +130,11 @@ export default {
         const token = window.sessionStorage.getItem('token')
         const _this = this
         this.$http.post('admin/automatically_assign_teacher', { token: token }).then(function (res) {
-          _this.tableData = res.data.data.students
+          if(res.data.code==500){
+            _this.$message.error(res.data.message);
+          }else{
+            _this.tableData = res.data.data.students
+          }
           _this.loading = false
         })
       },
