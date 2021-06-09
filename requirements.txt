@@ -1,6 +1,6 @@
 cffi==1.14.0
 cryptography==2.8
-Django==2.2.10
+Django==2.2.22
 django-cors-headers==3.2.1
 mysqlclient==1.4.6
 Pillow==7.0.0
